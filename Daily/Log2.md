@@ -2,7 +2,14 @@ EasyTcpServer
 ====
 以此例子介绍一个发送消息给客户端的TcpServer
 ----
-
+### 步骤
+1. 创建一个socket套接字
+2. 绑定接收客户端连接的端口 bind
+3. 监听网络端口 listen
+4. 等待客户端连接 accept
+/*5. 接收到客户端的消息 */
+5. 发送客户端的消息 send
+6. 关闭socket
 
 
 部分疑惑介绍
@@ -40,6 +47,16 @@ inet_ntoa()是编程语言，功能是将网络地址转换成“.”点隔的�
 **解决方案**<BR>
 增加宏（设置->预处理) `_WINSOCK_DEPRECATED_NO_WARNINGS`
 
+
+EasyTcpClient
+====
+以此例子介绍一个接收服务端的TcpClient
+----
+### 步骤
+1. 建立一个 socket
+2. 连接服务器 connect
+3. 接收服务器信息 recv
+4. 关闭socket closesocket
 
 
 
