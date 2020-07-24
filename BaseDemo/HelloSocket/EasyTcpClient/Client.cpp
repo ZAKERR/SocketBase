@@ -10,6 +10,7 @@ int main(int argc, char * argv)
 	WSADATA dat;
 
 	WSAStartup(ver, &dat);
+	// 1. 建立一个 socket
 	SOCKET _sock = socket(AF_INET, SOCK_STREAM, 0);
 	
 	if (SOCKET_ERROR == _sock) {
@@ -25,7 +26,7 @@ int main(int argc, char * argv)
 	_sun.sin_port = htons(4567);
 	_sun.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 
-	//连接
+	//2. 连接服务器 connect
 	int ret = connect(_sock, (sockaddr*)&_sun,
 		sizeof(_sun));
 
@@ -36,6 +37,7 @@ int main(int argc, char * argv)
 		printf("Connet Server Socket has success!\n");
 	}
 
+	//3. 接收服务器信息 recv
 	char recvBuf[256] = {};
 	int nLen = recv(_sock, recvBuf, 256, 0);
 	if (nLen > 0)
@@ -45,6 +47,8 @@ int main(int argc, char * argv)
 	else {
 		printf("Invalid Data\n", recvBuf);
 	}
+	//4. 关闭socket closesocket
+	closesocket(_sock);
 	WSACleanup();
 	getchar();
 	return 0;

@@ -12,6 +12,71 @@ EasyTcpServer
 6. 关闭socket
 
 
+### 示例代码
+```
+#define WIN32_LEAN_AND_MEAN
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#include <Windows.h>
+#include <WinSock2.h>
+#include <cstdio>
+#pragma comment(lib,"ws2_32.lib")
+
+int main(int argc, char *argv[]) {
+	WORD ver = MAKEWORD(2, 2);
+	WSADATA dat;
+	WSAStartup(ver, &dat);
+	//1. 创建一个socket套接字
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	if (INVALID_SOCKET == sock) {
+		printf("服务器Socket建立失败！\n");
+	}
+	else {
+		printf("服务器Socket建立成功！\n");
+	}
+
+	//绑定信息
+	sockaddr_in _sin = {};
+	_sin.sin_family = AF_INET;
+	_sin.sin_port = htons(4567);
+	_sin.sin_addr.S_un.S_addr = INADDR_ANY;
+
+	//2. 绑定接收客户端连接的端口 bind
+	int ret = bind(sock, (sockaddr *)&_sin, sizeof(_sin));
+	if (SOCKET_ERROR == ret) {
+		printf("端口被占用!\n");
+	}
+	//3. 监听网络端口 listen
+	ret = listen(sock, 5);
+	if (SOCKET_ERROR == ret) {
+		printf("无法监听\n");
+	}
+
+	sockaddr_in clientAddr = {};
+	int nAddrlen = sizeof(sockaddr_in);
+	SOCKET _cSock = INVALID_SOCKET;
+	char msgBuf[256] = "Hello,My name is dajiao";
+	while (true) {
+		//4. 等待客户端(多个）连接 accept
+		_cSock = accept(sock, (sockaddr *)&clientAddr,
+			&nAddrlen);
+
+		if (_cSock == INVALID_SOCKET) {
+			printf("无效客户端连接!\n");
+		}
+		
+		printf("新客户端连接! IP = %s\n",inet_ntoa(clientAddr.sin_addr));
+		//5. 发送客户端的消息 send
+		send(_cSock, msgBuf, strlen(msgBuf) + 1,
+					 0);
+	}
+	//6. 关闭socket
+	closesocket(sock);
+	
+	WSACleanup();
+}
+```
+
 部分疑惑介绍
 ----
 1. socket编程为什么需要htons(), ntohl(), ntohs()，htons() <BR>
@@ -59,5 +124,62 @@ EasyTcpClient
 4. 关闭socket closesocket
 
 
+### 示例代码
+```
+#define WIN32_LEAN_AND_MEAN
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#include <WinSock2.h>
+#include <cstdio>
 
+#pragma comment(lib,"ws2_32.lib")
+int main(int argc, char * argv)
+{
+	WORD ver = MAKEWORD(2, 2);
+	WSADATA dat;
+
+	WSAStartup(ver, &dat);
+	// 1. 建立一个 socket
+	SOCKET _sock = socket(AF_INET, SOCK_STREAM, 0);
+	
+	if (SOCKET_ERROR == _sock) {
+		printf("Client socket create Failed!\n");
+	}
+	else {
+		printf("Client socket create Successfully\n");
+	}
+
+	//创建连接Socket服务器的信息
+	sockaddr_in _sun = {};
+	_sun.sin_family = AF_INET;
+	_sun.sin_port = htons(4567);
+	_sun.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+
+	//2. 连接服务器 connect
+	int ret = connect(_sock, (sockaddr*)&_sun,
+		sizeof(_sun));
+
+	if (INVALID_SOCKET == ret) {
+		printf("Connet Server Socket has failed!\n");
+	}
+	else {
+		printf("Connet Server Socket has success!\n");
+	}
+
+	//3. 接收服务器信息 recv
+	char recvBuf[256] = {};
+	int nLen = recv(_sock, recvBuf, 256, 0);
+	if (nLen > 0)
+	{
+		printf("From Server Socket message is %s \n", recvBuf);
+	}
+	else {
+		printf("Invalid Data\n", recvBuf);
+	}
+	//4. 关闭socket closesocket
+	closesocket(_sock);
+	WSACleanup();
+	getchar();
+	return 0;
+}
+```
 
