@@ -23,32 +23,51 @@ int main(int argc, char * argv)
 	//创建连接Socket服务器的信息
 	sockaddr_in _sun = {};
 	_sun.sin_family = AF_INET;
-	_sun.sin_port = htons(4567);
+	_sun.sin_port = htons(330);
 	_sun.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 
 	//2. 连接服务器 connect
 	int ret = connect(_sock, (sockaddr*)&_sun,
 		sizeof(_sun));
-
+	
 	if (INVALID_SOCKET == ret) {
 		printf("Connet Server Socket has failed!\n");
+		getchar();
+		return 0;
 	}
 	else {
 		printf("Connet Server Socket has success!\n");
+		return 0;
 	}
+    
+	while (true) {
+		//3. 接收用户指令
+		char cSendMsg[256] = {};
+		printf("请输入指令:");
+		scanf("%s",cSendMsg);
+		//4， 处理用户指令
+		if (strcmp(cSendMsg, "exit") == 0)
+		{
+			break;
+		}
+		//5. 发送消息至服务端
+		send(_sock, cSendMsg, 256, 0);
 
-	//3. 接收服务器信息 recv
-	char recvBuf[256] = {};
-	int nLen = recv(_sock, recvBuf, 256, 0);
-	if (nLen > 0)
-	{
-		printf("From Server Socket message is %s \n", recvBuf);
+		//6. 接收服务器信息 recv
+		char recvBuf[256] = {};
+		int nLen = recv(_sock, recvBuf, 256, 0);
+		if (nLen > 0)
+		{
+			printf("From Server Socket message is %s \n", recvBuf);
+		}
+		else {
+			printf("Invalid Data\n", recvBuf);
+		}
 	}
-	else {
-		printf("Invalid Data\n", recvBuf);
-	}
-	//4. 关闭socket closesocket
+	
+	//7. 关闭socket closesocket
 	closesocket(_sock);
+	printf("客户端已退出!");
 	WSACleanup();
 	getchar();
 	return 0;
