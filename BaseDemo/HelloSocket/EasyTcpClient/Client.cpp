@@ -1,6 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WinSock2.h>
+#include <Windows.h>
 #include <cstdio>
 
 #pragma comment(lib,"ws2_32.lib")
@@ -13,7 +14,7 @@ int main(int argc, char * argv)
 	// 1. 建立一个 socket
 	SOCKET _sock = socket(AF_INET, SOCK_STREAM, 0);
 	
-	if (SOCKET_ERROR == _sock) {
+	if (INVALID_SOCKET == _sock) {
 		printf("Client socket create Failed!\n");
 	}
 	else {
@@ -30,14 +31,12 @@ int main(int argc, char * argv)
 	int ret = connect(_sock, (sockaddr*)&_sun,
 		sizeof(_sun));
 	
-	if (INVALID_SOCKET == ret) {
-		printf("Connet Server Socket has failed!\n");
-		getchar();
+	if (SOCKET_ERROR == ret) {
+		printf("Connect Server Socket has failed!\n");
 		return 0;
 	}
 	else {
-		printf("Connet Server Socket has success!\n");
-		return 0;
+		printf("Connect Server Socket has success!\n");
 	}
     
 	while (true) {
