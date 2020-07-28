@@ -5,6 +5,12 @@
 #include <cstdio>
 
 #pragma comment(lib,"ws2_32.lib")
+
+struct person {
+	int age;
+	char name[256];
+};
+
 int main(int argc, char * argv)
 {
 	WORD ver = MAKEWORD(2, 2);
@@ -57,7 +63,9 @@ int main(int argc, char * argv)
 		int nLen = recv(_sock, recvBuf, 256, 0);
 		if (nLen > 0)
 		{
-			printf("From Server Socket message is %s \n", recvBuf);
+			// 接收结构化的网络消息
+			person* info = (person *)recvBuf;
+			printf("From Server Socket message is Age:%d ,Name:%s \n", info->age,info->name);
 		}
 		else {
 			printf("Invalid Data\n", recvBuf);

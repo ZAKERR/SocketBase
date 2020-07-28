@@ -5,6 +5,11 @@
 #include <cstdio>
 #pragma comment(lib,"ws2_32.lib")
 
+struct person{
+	int age;
+	char name[256];
+};
+
 int main(int argc, char *argv[]) {
 	WORD ver = MAKEWORD(2, 2);
 	WSADATA dat;
@@ -75,7 +80,13 @@ int main(int argc, char *argv[]) {
 		}
 
 		//6. 处理来自客户端的消息
-		if (strcmp(recvBuf, "GetName") == 0) {
+		if (strcmp(recvBuf, "GetInfo") == 0) {
+			// 发送结构化的网络消息
+			person me = { 23,"黄杰航" };
+			send(_cSock, (const char*)&me, sizeof(person), 0);
+			continue;
+		}
+		else if (strcmp(recvBuf, "GetName") == 0) {
 			strcpy_s(sendBuf, "dajiao");
 		}
 		else if (strcmp(recvBuf, "GetAge") == 0) {
@@ -88,6 +99,7 @@ int main(int argc, char *argv[]) {
 		else
 		{
 			strcpy_s(sendBuf, "???");
+
 		}
 
 		//8. 发送客户端的消息 send
